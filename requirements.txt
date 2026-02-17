@@ -1,0 +1,12 @@
+fastapi>=0.104.0
+uvicorn>=0.23.2
+python-dotenv>=1.0.0
+langchain>=0.1.0
+langchain-community
+langchain-groq>=0.1.0
+langchain-huggingface>=0.0.1
+faiss-cpu>=1.7.4
+pypdf>=3.15.1
+python-multipart>=0.0.6
+docx2txt>=0.8
+sentence-transformers>=2.2.2
