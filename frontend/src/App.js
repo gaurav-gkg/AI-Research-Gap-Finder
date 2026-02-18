@@ -38,6 +38,10 @@ function App() {
   const [results, setResults] = useState(null);
   const [error, setError] = useState(null);
   const [promptText, setPromptText] = useState("");
+  const [chatMessages, setChatMessages] = useState([]);
+  const [chatLoading, setChatLoading] = useState(false);
+  const [sessionId, setSessionId] = useState(null);
+  const [isChatOpen, setIsChatOpen] = useState(false);
   const [activeUploadTab, setActiveUploadTab] = useState("upload");
   const [pasteText, setPasteText] = useState("");
   const [urlText, setUrlText] = useState("");
@@ -75,6 +79,8 @@ function App() {
 
       if (data.success) {
         setResults(data);
+        setSessionId(data.session_id);
+        setChatMessages([]);
       } else {
         setError(data.error || "An error occurred during analysis");
       }
@@ -84,6 +90,54 @@ function App() {
       );
     } finally {
       setLoading(false);
+    }
+  };
+
+  /* ── Chat handler ── */
+  const handleSendMessage = async (message) => {
+    if (!sessionId) return;
+
+    const userMsg = { role: "user", content: message };
+    setChatMessages((prev) => [...prev, userMsg]);
+    setChatLoading(true);
+
+    try {
+      const response = await fetch("http://localhost:8000/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          question: message,
+          session_id: sessionId,
+          chat_history: [...chatMessages, userMsg],
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setChatMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: data.answer },
+        ]);
+      } else {
+        setChatMessages((prev) => [
+          ...prev,
+          {
+            role: "assistant",
+            content: `Error: ${data.error || "Failed to get a response."}`,
+          },
+        ]);
+      }
+    } catch (err) {
+      setChatMessages((prev) => [
+        ...prev,
+        {
+          role: "assistant",
+          content: "Failed to connect to the server. Please try again.",
+        },
+      ]);
+    } finally {
+      setChatLoading(false);
     }
   };
 
@@ -180,8 +234,8 @@ function App() {
 
   return (
     <div className="app-layout">
-      <Sidebar 
-        activeTab={activeTab} 
+      <Sidebar
+        activeTab={activeTab}
         setActiveTab={setActiveTab}
         isCollapsed={isSidebarCollapsed}
         setIsCollapsed={setIsSidebarCollapsed}
@@ -189,7 +243,30 @@ function App() {
 
       <div className="main-wrapper">
         <div className="main-content">{renderContent()}</div>
-        <PromptBar promptText={promptText} setPromptText={setPromptText} />
+        {activeTab === "analyze" && results && (
+          <>
+            {isChatOpen && (
+              <PromptBar
+                promptText={promptText}
+                setPromptText={setPromptText}
+                chatMessages={chatMessages}
+                onSendMessage={handleSendMessage}
+                chatLoading={chatLoading}
+              />
+            )}
+            <button
+              className={`chat-toggle-fab ${isChatOpen ? "open" : ""}`}
+              onClick={() => setIsChatOpen((v) => !v)}
+              title={isChatOpen ? "Hide chat" : "Ask about this paper"}
+            >
+              {isChatOpen ? (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              ) : (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+              )}
+            </button>
+          </>
+        )}
       </div>
     </div>
   );

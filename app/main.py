@@ -3,10 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+from typing import List, Optional
 from dotenv import load_dotenv
 import os
 import tempfile
-from app.utils import query_rag
+import uuid
+from app.utils import query_rag, query_chat, get_or_create_vector_store, clear_vector_store
 
 # Load environment variables
 load_dotenv()
@@ -31,7 +33,25 @@ class AnalysisResponse(BaseModel):
     response: str
     sources: str
     success: bool
+    session_id: str = None
     error: str = None
+
+class ChatMessage(BaseModel):
+    role: str
+    content: str
+
+class ChatRequest(BaseModel):
+    question: str
+    session_id: str
+    chat_history: Optional[List[ChatMessage]] = []
+
+class ChatResponse(BaseModel):
+    answer: str
+    success: bool
+    error: str = None
+
+# In-memory store for session file paths
+_session_files = {}
 
 @app.get("/")
 async def root():
@@ -56,26 +76,65 @@ async def analyze_paper(
             temp_file.write(content)
             temp_path = temp_file.name
         
+        # Create a session ID for this analysis
+        session_id = str(uuid.uuid4())
+        
         # Process the PDF
         answer, sources = query_rag(temp_path, query_type)
         
-        # Clean up temp file
-        os.remove(temp_path)
+        # Pre-build the vector store for chat and keep the file for the session
+        get_or_create_vector_store(temp_path, session_id)
+        _session_files[session_id] = temp_path
         
-        return AnalysisResponse(
-            response=answer,
-            sources=sources,
-            success=True
-        )
+        return {
+            "response": answer,
+            "sources": sources,
+            "success": True,
+            "session_id": session_id,
+        }
     
     except Exception as e:
         # Clean up temp file if it exists
         if 'temp_path' in locals() and os.path.exists(temp_path):
             os.remove(temp_path)
         
-        return AnalysisResponse(
-            response="",
-            sources="",
+        return JSONResponse(content={
+            "response": "",
+            "sources": "",
+            "success": False,
+            "error": str(e)
+        })
+
+@app.post("/api/chat")
+async def chat_with_paper(request: ChatRequest):
+    """
+    Chat with the analyzed research paper using RAG
+    """
+    session_id = request.session_id
+    
+    if session_id not in _session_files:
+        return ChatResponse(
+            answer="",
+            success=False,
+            error="Session not found. Please analyze a paper first."
+        )
+    
+    file_path = _session_files[session_id]
+    
+    if not os.path.exists(file_path):
+        return ChatResponse(
+            answer="",
+            success=False,
+            error="Document file not found. Please re-upload and analyze."
+        )
+    
+    try:
+        chat_history = [{"role": m.role, "content": m.content} for m in (request.chat_history or [])]
+        answer = query_chat(file_path, request.question, chat_history, session_id)
+        return ChatResponse(answer=answer, success=True)
+    except Exception as e:
+        return ChatResponse(
+            answer="",
             success=False,
             error=str(e)
         )

@@ -160,10 +160,10 @@ function Sidebar({ activeTab, setActiveTab, isCollapsed, setIsCollapsed }) {
   ];
 
   return (
-    <aside className={`sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+    <aside className={`sidebar ${isCollapsed ? "collapsed" : ""}`}>
       {/* Header with Menu Toggle */}
       <div className="sidebar-header">
-        <button 
+        <button
           className="menu-toggle-btn"
           onClick={() => setIsCollapsed(!isCollapsed)}
           aria-label="Toggle sidebar"
@@ -190,7 +190,9 @@ function Sidebar({ activeTab, setActiveTab, isCollapsed, setIsCollapsed }) {
 
       {/* Navigation */}
       <div style={{ flex: 1, overflowY: "auto" }}>
-        {!isCollapsed && <div className="sidebar-section-label">Navigation</div>}
+        {!isCollapsed && (
+          <div className="sidebar-section-label">Navigation</div>
+        )}
         {navItems.map((item) => {
           const { Icon } = item;
           return (

@@ -102,6 +102,68 @@ def process_pdf(pdf_path):
     """Process PDF and create vector database (legacy function)"""
     return process_document(pdf_path)
 
+# ── In-memory store for chat vector DBs ──
+_chat_vector_stores = {}
+
+def get_or_create_vector_store(file_path, session_id=None):
+    """Get existing vector store or create a new one for the document"""
+    key = session_id or file_path
+    if key not in _chat_vector_stores:
+        _chat_vector_stores[key] = process_document(file_path)
+    return _chat_vector_stores[key]
+
+def clear_vector_store(session_id):
+    """Clear a cached vector store"""
+    if session_id in _chat_vector_stores:
+        del _chat_vector_stores[session_id]
+
+# Chat prompt template
+chat_prompt = PromptTemplate(
+    input_variables=["context", "question", "chat_history"],
+    template="""You are a helpful research assistant. Answer the user's question based strictly on the provided research paper content. If the answer cannot be found in the document, say so clearly.
+
+Document content:
+{context}
+
+Previous conversation:
+{chat_history}
+
+User question: {question}
+
+Provide a clear, concise answer based on the document. Use specific details, quotes, or data from the paper when possible. Format your response with markdown for readability.
+"""
+)
+
+def query_chat(file_path, question, chat_history=None, session_id=None):
+    """Answer a question about the document using RAG"""
+    vector_db = get_or_create_vector_store(file_path, session_id)
+    retriever = vector_db.as_retriever(search_kwargs={"k": 5})
+
+    def format_docs(docs):
+        return "\n\n".join(doc.page_content for doc in docs)
+
+    # Format chat history
+    history_str = ""
+    if chat_history:
+        for msg in chat_history[-6:]:  # Keep last 6 messages for context
+            role = "User" if msg["role"] == "user" else "Assistant"
+            history_str += f"{role}: {msg['content']}\n"
+
+    # Retrieve relevant chunks
+    relevant_docs = retriever.invoke(question)
+    context = format_docs(relevant_docs)
+
+    # Build the prompt and invoke LLM
+    formatted_prompt = chat_prompt.format(
+        context=context,
+        question=question,
+        chat_history=history_str
+    )
+
+    response = llm.invoke(formatted_prompt)
+    answer = response.content if hasattr(response, 'content') else str(response)
+    return answer
+
 def query_rag(file_path, query_type):
     """Perform RAG query on the document (PDF or DOCX)"""
     vector_db = process_document(file_path)
