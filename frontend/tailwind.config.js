@@ -3,13 +3,21 @@ module.exports = {
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
   theme: {
     extend: {
-      colors: {
-        "academic-blue": "#3B82F6",
-        "academic-green": "#10B981",
-        "academic-purple": "#8B5CF6",
-      },
       fontFamily: {
-        sans: ["Inter", "system-ui", "-apple-system", "sans-serif"],
+        sans: [
+          "'Google Sans'",
+          "Inter",
+          "system-ui",
+          "-apple-system",
+          "sans-serif",
+        ],
+        display: [
+          "'Google Sans Display'",
+          "'Google Sans'",
+          "Inter",
+          "sans-serif",
+        ],
+        mono: ["'Google Sans Mono'", "'Fira Code'", "monospace"],
       },
     },
   },

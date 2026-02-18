@@ -4,18 +4,61 @@
     <meta charset="utf-8" />
     <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#000000" />
-    <meta
-      name="description"
-      content="AI-powered Research Paper Analyzer - Extract insights and identify research gaps"
-    />
+    <meta name="theme-color" content="#1c1f23" />
+    <meta name="description" content="AI-powered Research Gap Analyzer" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Google Sans family (proprietary — attempt load, fallback to Inter) -->
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&family=Google+Sans+Display:wght@400;500;600;700&family=Google+Sans+Mono:wght@400;500&family=Inter:wght@300;400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
-    <title>Research Paper Analyzer</title>
+    <!-- Fallback: also load Product Sans via alternative CDN -->
+    <style>
+      @font-face {
+        font-family: "Google Sans";
+        font-style: normal;
+        font-weight: 400;
+        src: url("https://fonts.gstatic.com/s/googlesans/v58/4UaGrENHsxJlGDuGo1OIlL3Owp4.woff2")
+          format("woff2");
+      }
+      @font-face {
+        font-family: "Google Sans";
+        font-style: normal;
+        font-weight: 500;
+        src: url("https://fonts.gstatic.com/s/googlesans/v58/4UabrENHsxJlGDuGo1OIlLU94Yt3CwZ-Pw.woff2")
+          format("woff2");
+      }
+      @font-face {
+        font-family: "Google Sans";
+        font-style: normal;
+        font-weight: 700;
+        src: url("https://fonts.gstatic.com/s/googlesans/v58/4UabrENHsxJlGDuGo1OIlLVm44t3CwZ-Pw.woff2")
+          format("woff2");
+      }
+      @font-face {
+        font-family: "Google Sans Display";
+        font-style: normal;
+        font-weight: 400;
+        src: url("https://fonts.gstatic.com/s/googlesansdisplay/v22/ea8daQgmLGFNicmOkSv0rP9S-t4.woff2")
+          format("woff2");
+      }
+      @font-face {
+        font-family: "Google Sans Display";
+        font-style: normal;
+        font-weight: 600;
+        src: url("https://fonts.gstatic.com/s/googlesansdisplay/v22/ea8caQgmLGFNicmOkSv0rPdqP3i0h8kI0dB-.woff2")
+          format("woff2");
+      }
+      @font-face {
+        font-family: "Google Sans Mono";
+        font-style: normal;
+        font-weight: 400;
+        src: url("https://fonts.gstatic.com/s/googlesansmono/v19/P5sUzYWFKnV0olKmb0Fr8RQS3mzXcA.woff2")
+          format("woff2");
+      }
+    </style>
+    <title>ResearchAI - Research Gap Analyzer</title>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
