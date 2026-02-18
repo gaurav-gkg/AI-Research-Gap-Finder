@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 import os
 import tempfile
 import uuid
-from app.utils import query_rag, query_chat, get_or_create_vector_store, clear_vector_store
+from app.utils import query_rag, query_chat, get_or_create_vector_store, clear_vector_store, process_text, process_url, query_rag_from_vectorstore
 
 # Load environment variables
 load_dotenv()
@@ -49,6 +49,14 @@ class ChatResponse(BaseModel):
     answer: str
     success: bool
     error: str = None
+
+class TextAnalysisRequest(BaseModel):
+    text: str
+    query_type: str = "Research Gaps"
+
+class UrlAnalysisRequest(BaseModel):
+    url: str
+    query_type: str = "Research Gaps"
 
 # In-memory store for session file paths
 _session_files = {}
@@ -105,6 +113,74 @@ async def analyze_paper(
             "error": str(e)
         })
 
+@app.post("/api/analyze-text")
+async def analyze_text(request: TextAnalysisRequest):
+    """Analyze pasted research paper text"""
+    if not request.text or not request.text.strip():
+        return JSONResponse(content={
+            "response": "", "sources": "", "success": False,
+            "error": "No text provided."
+        })
+    
+    try:
+        session_id = str(uuid.uuid4())
+        vector_db = process_text(request.text)
+        
+        # Save the text to a temp file for chat session
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".txt", mode="w", encoding="utf-8") as tmp:
+            tmp.write(request.text)
+            tmp_path = tmp.name
+        
+        _session_files[session_id] = tmp_path
+        _chat_vector_stores_direct[session_id] = vector_db
+        
+        answer, sources = query_rag_from_vectorstore(vector_db, request.query_type)
+        
+        return {
+            "response": answer,
+            "sources": sources,
+            "success": True,
+            "session_id": session_id,
+        }
+    except Exception as e:
+        return JSONResponse(content={
+            "response": "", "sources": "", "success": False,
+            "error": str(e)
+        })
+
+@app.post("/api/analyze-url")
+async def analyze_url(request: UrlAnalysisRequest):
+    """Analyze a research paper from a URL or DOI"""
+    if not request.url or not request.url.strip():
+        return JSONResponse(content={
+            "response": "", "sources": "", "success": False,
+            "error": "No URL provided."
+        })
+    
+    try:
+        session_id = str(uuid.uuid4())
+        tmp_path, vector_db = process_url(request.url)
+        
+        _session_files[session_id] = tmp_path
+        _chat_vector_stores_direct[session_id] = vector_db
+        
+        answer, sources = query_rag_from_vectorstore(vector_db, request.query_type)
+        
+        return {
+            "response": answer,
+            "sources": sources,
+            "success": True,
+            "session_id": session_id,
+        }
+    except Exception as e:
+        return JSONResponse(content={
+            "response": "", "sources": "", "success": False,
+            "error": str(e)
+        })
+
+# Direct vector store cache (for text/url that bypass file-based process_document)
+_chat_vector_stores_direct = {}
+
 @app.post("/api/chat")
 async def chat_with_paper(request: ChatRequest):
     """
@@ -130,6 +206,12 @@ async def chat_with_paper(request: ChatRequest):
     
     try:
         chat_history = [{"role": m.role, "content": m.content} for m in (request.chat_history or [])]
+        
+        # If we have a pre-built vector store (from text/url), register it for chat
+        if session_id in _chat_vector_stores_direct:
+            from app.utils import _chat_vector_stores
+            _chat_vector_stores[session_id] = _chat_vector_stores_direct[session_id]
+        
         answer = query_chat(file_path, request.question, chat_history, session_id)
         return ChatResponse(answer=answer, success=True)
     except Exception as e:

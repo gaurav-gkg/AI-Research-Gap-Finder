@@ -56,8 +56,17 @@ function App() {
 
   /* ── Analyze handler ── */
   const handleAnalyze = async () => {
-    if (!selectedFile) {
+    // Validate based on active tab
+    if (activeUploadTab === "upload" && !selectedFile) {
       setError("Please upload a document first");
+      return;
+    }
+    if (activeUploadTab === "paste" && !pasteText.trim()) {
+      setError("Please paste your research paper text");
+      return;
+    }
+    if (activeUploadTab === "url" && !urlText.trim()) {
+      setError("Please enter a paper URL or DOI");
       return;
     }
 
@@ -66,14 +75,38 @@ function App() {
     setResults(null);
 
     try {
-      const formData = new FormData();
-      formData.append("file", selectedFile);
-      formData.append("query_type", "Research Gaps");
+      let response;
 
-      const response = await fetch("http://localhost:8000/api/analyze", {
-        method: "POST",
-        body: formData,
-      });
+      if (activeUploadTab === "paste") {
+        // Pasted text analysis
+        response = await fetch("http://localhost:8000/api/analyze-text", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            text: pasteText,
+            query_type: "Research Gaps",
+          }),
+        });
+      } else if (activeUploadTab === "url") {
+        // URL / DOI analysis
+        response = await fetch("http://localhost:8000/api/analyze-url", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            url: urlText,
+            query_type: "Research Gaps",
+          }),
+        });
+      } else {
+        // File upload analysis
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+        formData.append("query_type", "Research Gaps");
+        response = await fetch("http://localhost:8000/api/analyze", {
+          method: "POST",
+          body: formData,
+        });
+      }
 
       const data = await response.json();
 
@@ -175,7 +208,12 @@ function App() {
               <button
                 className="run-btn"
                 onClick={handleAnalyze}
-                disabled={!selectedFile || loading}
+                disabled={
+                  loading ||
+                  (activeUploadTab === "upload" && !selectedFile) ||
+                  (activeUploadTab === "paste" && !pasteText.trim()) ||
+                  (activeUploadTab === "url" && !urlText.trim())
+                }
               >
                 {loading ? (
                   <>
@@ -260,9 +298,32 @@ function App() {
               title={isChatOpen ? "Hide chat" : "Ask about this paper"}
             >
               {isChatOpen ? (
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18" />
+                  <line x1="6" y1="6" x2="18" y2="18" />
+                </svg>
               ) : (
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
+                </svg>
               )}
             </button>
           </>

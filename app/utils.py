@@ -1,10 +1,12 @@
 import os
 import tempfile
+import requests
 from langchain_community.vectorstores import FAISS
 from langchain_community.document_loaders import PyPDFLoader, Docx2txtLoader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_core.runnables import RunnablePassthrough
 from langchain_core.prompts import PromptTemplate
+from langchain_core.documents import Document
 from dotenv import load_dotenv
 
 # Load environment variables
@@ -97,6 +99,94 @@ def process_document(file_path):
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
     chunks = text_splitter.split_documents(documents)
     return FAISS.from_documents(chunks, embeddings)
+
+def process_text(text):
+    """Process raw text and create vector database"""
+    if not text or not text.strip():
+        raise ValueError("No text provided.")
+    documents = [Document(page_content=text, metadata={"source": "pasted_text"})]
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
+    chunks = text_splitter.split_documents(documents)
+    return FAISS.from_documents(chunks, embeddings)
+
+def process_url(url):
+    """Download a paper from URL and process it. Supports direct PDF links, arXiv, and DOI."""
+    url = url.strip()
+    
+    # Handle DOI — resolve to URL
+    if url.startswith("10.") or url.startswith("doi:"):
+        doi = url.replace("doi:", "").strip()
+        url = f"https://doi.org/{doi}"
+    
+    # Handle arXiv abstract URL → convert to PDF URL
+    if "arxiv.org/abs/" in url:
+        url = url.replace("/abs/", "/pdf/") + ".pdf"
+    
+    # Try downloading as PDF
+    headers = {"User-Agent": "Mozilla/5.0 (ResearchAI Paper Analyzer)"}
+    response = requests.get(url, headers=headers, timeout=30, allow_redirects=True)
+    response.raise_for_status()
+    
+    content_type = response.headers.get("Content-Type", "")
+    
+    if "pdf" in content_type or url.endswith(".pdf"):
+        # It's a PDF — save and process
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+            tmp.write(response.content)
+            tmp_path = tmp.name
+        return tmp_path, process_document(tmp_path)
+    else:
+        # Treat as HTML — extract text content
+        from html.parser import HTMLParser
+        
+        class TextExtractor(HTMLParser):
+            def __init__(self):
+                super().__init__()
+                self.texts = []
+                self._skip = False
+            def handle_starttag(self, tag, attrs):
+                self._skip = tag in ("script", "style", "nav", "header", "footer")
+            def handle_endtag(self, tag):
+                if tag in ("script", "style", "nav", "header", "footer"):
+                    self._skip = False
+            def handle_data(self, data):
+                if not self._skip:
+                    stripped = data.strip()
+                    if stripped:
+                        self.texts.append(stripped)
+        
+        parser = TextExtractor()
+        parser.feed(response.text)
+        extracted = "\n".join(parser.texts)
+        
+        if len(extracted) < 200:
+            raise ValueError("Could not extract enough text from the URL. Try providing a direct PDF link or pasting the text instead.")
+        
+        # Save extracted text as a temp file for session tracking
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".txt", mode="w", encoding="utf-8") as tmp:
+            tmp.write(extracted)
+            tmp_path = tmp.name
+        
+        return tmp_path, process_text(extracted)
+
+def query_rag_from_vectorstore(vector_db, query_type):
+    """Perform RAG query using an existing vector store"""
+    retriever = vector_db.as_retriever(search_kwargs={"k": 4})
+    prompt = key_insights_prompt if query_type == "Key Insights" else research_gaps_prompt
+    
+    def format_docs(docs):
+        return "\n\n".join(doc.page_content for doc in docs)
+    
+    from langchain_core.runnables import RunnableParallel
+    
+    rag_chain = (
+        RunnableParallel({"context": retriever | format_docs, "question": RunnablePassthrough()})
+        | prompt
+        | llm
+    )
+    response = rag_chain.invoke(query_type)
+    sources = "Analysis based on document contents"
+    return response.content if hasattr(response, 'content') else str(response), sources
 
 def process_pdf(pdf_path):
     """Process PDF and create vector database (legacy function)"""
