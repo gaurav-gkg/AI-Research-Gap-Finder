@@ -338,7 +338,11 @@ function ExportsPage({ results }) {
                   : ""
               }
             </body></html>`;
-          size = downloadBlob(html, "analysis_export.doc", "application/msword");
+          size = downloadBlob(
+            html,
+            "analysis_export.doc",
+            "application/msword",
+          );
         }
 
         // Record in history
@@ -531,8 +535,8 @@ function ExportsPage({ results }) {
         {exporting
           ? "Exporting…"
           : results
-          ? `Export as ${selectedFormat.toUpperCase()}`
-          : "Analyze a paper first to export"}
+            ? `Export as ${selectedFormat.toUpperCase()}`
+            : "Analyze a paper first to export"}
       </button>
 
       {/* Export History */}
@@ -567,52 +571,56 @@ function ExportsPage({ results }) {
           </div>
         ) : (
           exportHistory.map((item, i) => (
-          <div
-            key={item.id}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              padding: "12px 0",
-              borderBottom:
-                i < exportHistory.length - 1
-                  ? "1px solid var(--border)"
-                  : "none",
-            }}
-          >
-            <span
+            <div
+              key={item.id}
               style={{
-                width: 8,
-                height: 8,
-                borderRadius: "50%",
-                background: item.dotColor,
-                flexShrink: 0,
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                padding: "12px 0",
+                borderBottom:
+                  i < exportHistory.length - 1
+                    ? "1px solid var(--border)"
+                    : "none",
               }}
-            />
-            <div style={{ flex: 1, minWidth: 0 }}>
-              <div
+            >
+              <span
                 style={{
-                  fontSize: 13.5,
-                  fontWeight: 500,
-                  color: "var(--text-pri)",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
+                  width: 8,
+                  height: 8,
+                  borderRadius: "50%",
+                  background: item.dotColor,
+                  flexShrink: 0,
                 }}
-              >
-                {item.name}
+              />
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div
+                  style={{
+                    fontSize: 13.5,
+                    fontWeight: 500,
+                    color: "var(--text-pri)",
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {item.name}
+                </div>
+                <div
+                  style={{
+                    fontSize: 12,
+                    color: "var(--text-ter)",
+                    marginTop: 2,
+                  }}
+                >
+                  {item.format} · {item.size} · {item.date}
+                </div>
               </div>
-              <div
-                style={{ fontSize: 12, color: "var(--text-ter)", marginTop: 2 }}
-              >
-                {item.format} · {item.size} · {item.date}
-              </div>
+              <button className="icon-action-btn" title="Re-download">
+                <DownloadIcon />
+              </button>
             </div>
-            <button className="icon-action-btn" title="Re-download">
-              <DownloadIcon />
-            </button>
-          </div>
-        ))
+          ))
         )}
       </div>
     </div>
