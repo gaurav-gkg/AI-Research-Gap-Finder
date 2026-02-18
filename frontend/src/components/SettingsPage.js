@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useTheme } from "../contexts/ThemeContext";
 
 /* ── SVG Icons ── */
 const UserIcon = () => (
@@ -259,8 +260,7 @@ function SettingsPage() {
   const [email, setEmail] = useState("researcher@university.edu");
 
   /* Appearance */
-  const [theme, setTheme] = useState("dark");
-  const [fontSize, setFontSize] = useState("medium");
+  const { theme, setTheme, fontSize, setFontSize } = useTheme();
 
   /* AI & Analysis */
   const [defaultModel, setDefaultModel] = useState("llama3.2");
@@ -459,7 +459,7 @@ function SettingsPage() {
           label="Ollama API Endpoint"
           desc="URL for your local Ollama instance"
           value="http://localhost:11434"
-          onChange={() => {}}
+          onChange={() => { }}
           placeholder="http://localhost:11434"
         />
         <div style={{ borderTop: "1px solid var(--border)" }} />
@@ -467,7 +467,7 @@ function SettingsPage() {
           label="Backend API URL"
           desc="URL for the ResearchAI FastAPI server"
           value="http://localhost:8000"
-          onChange={() => {}}
+          onChange={() => { }}
           placeholder="http://localhost:8000"
         />
       </SettingsSection>
