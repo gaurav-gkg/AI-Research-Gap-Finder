@@ -95,68 +95,7 @@ const DownloadIcon = () => (
 );
 
 /* ── Mock data ── */
-const mockAnalyses = [
-  {
-    id: 1,
-    title: "Transformer Architecture Gaps in NLP",
-    paperName: "attention_is_all_you_need_v2.pdf",
-    date: "Feb 17, 2026",
-    time: "2:34 PM",
-    domain: "Computer Science",
-    type: "Research Gaps",
-    gapsFound: 7,
-    status: "completed",
-    dotColor: "#4285f4",
-  },
-  {
-    id: 2,
-    title: "Climate Modeling Review — IPCC AR6",
-    paperName: "ipcc_ar6_wg1_chapter7.pdf",
-    date: "Feb 16, 2026",
-    time: "11:20 AM",
-    domain: "Environmental Science",
-    type: "Key Insights",
-    gapsFound: 4,
-    status: "completed",
-    dotColor: "#81c995",
-  },
-  {
-    id: 3,
-    title: "NLP Benchmark Analysis 2025",
-    paperName: "nlp_benchmarks_survey.pdf",
-    date: "Feb 15, 2026",
-    time: "9:05 AM",
-    domain: "Computer Science",
-    type: "Research Gaps",
-    gapsFound: 11,
-    status: "completed",
-    dotColor: "#c58af9",
-  },
-  {
-    id: 4,
-    title: "Quantum Error Correction Methods",
-    paperName: "quantum_error_correction.pdf",
-    date: "Feb 14, 2026",
-    time: "4:18 PM",
-    domain: "Physics",
-    type: "Citation Analysis",
-    gapsFound: 3,
-    status: "completed",
-    dotColor: "#fdd663",
-  },
-  {
-    id: 5,
-    title: "Federated Learning in Healthcare",
-    paperName: "fed_learning_health.pdf",
-    date: "Feb 12, 2026",
-    time: "1:45 PM",
-    domain: "Medicine & Health",
-    type: "Research Gaps",
-    gapsFound: 9,
-    status: "completed",
-    dotColor: "#78d9ec",
-  },
-];
+const mockAnalyses = [];
 
 function PreviousAnalysesPage({ setActiveTab }) {
   const [searchQuery, setSearchQuery] = useState("");

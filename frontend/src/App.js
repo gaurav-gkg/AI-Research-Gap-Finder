@@ -184,7 +184,7 @@ function App() {
       case "documents":
         return <MyDocumentsPage setActiveTab={setActiveTab} />;
       case "exports":
-        return <ExportsPage />;
+        return <ExportsPage results={results} />;
       case "settings":
         return <SettingsPage />;
       default:

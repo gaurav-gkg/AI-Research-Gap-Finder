@@ -153,11 +153,7 @@ function Sidebar({ activeTab, setActiveTab, isCollapsed, setIsCollapsed }) {
     { id: "exports", label: "Exports", Icon: DownloadIcon },
   ];
 
-  const recentItems = [
-    { color: "#4285f4", text: "Transformer architecture gaps" },
-    { color: "#81c995", text: "Climate modeling review" },
-    { color: "#c58af9", text: "NLP benchmark analysis" },
-  ];
+  const recentItems = [];
 
   return (
     <aside className={`sidebar ${isCollapsed ? "collapsed" : ""}`}>

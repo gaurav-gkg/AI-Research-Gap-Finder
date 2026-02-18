@@ -141,56 +141,7 @@ const UploadIcon = () => (
 );
 
 /* ── Mock data ── */
-const mockDocs = [
-  {
-    id: 1,
-    name: "attention_is_all_you_need_v2.pdf",
-    ext: "pdf",
-    size: "2.4 MB",
-    uploaded: "Feb 17, 2026",
-    analyses: 2,
-  },
-  {
-    id: 2,
-    name: "ipcc_ar6_wg1_chapter7.pdf",
-    ext: "pdf",
-    size: "8.1 MB",
-    uploaded: "Feb 16, 2026",
-    analyses: 1,
-  },
-  {
-    id: 3,
-    name: "nlp_benchmarks_survey.pdf",
-    ext: "pdf",
-    size: "1.7 MB",
-    uploaded: "Feb 15, 2026",
-    analyses: 3,
-  },
-  {
-    id: 4,
-    name: "quantum_error_correction.pdf",
-    ext: "pdf",
-    size: "3.2 MB",
-    uploaded: "Feb 14, 2026",
-    analyses: 1,
-  },
-  {
-    id: 5,
-    name: "fed_learning_health.docx",
-    ext: "docx",
-    size: "965 KB",
-    uploaded: "Feb 12, 2026",
-    analyses: 1,
-  },
-  {
-    id: 6,
-    name: "gpt4_technical_report.pdf",
-    ext: "pdf",
-    size: "5.6 MB",
-    uploaded: "Feb 10, 2026",
-    analyses: 0,
-  },
-];
+const mockDocs = [];
 
 function MyDocumentsPage({ setActiveTab }) {
   const [searchQuery, setSearchQuery] = useState("");
@@ -200,7 +151,7 @@ function MyDocumentsPage({ setActiveTab }) {
     d.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  const totalSize = "21.9 MB";
+  const totalSize = "0 MB";
 
   return (
     <div className="anim-hero">

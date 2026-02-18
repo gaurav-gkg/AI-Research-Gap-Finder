@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
+import { jsPDF } from "jspdf";
 
 /* ── SVG Icons ── */
 const PdfExportIcon = () => (
@@ -177,46 +178,188 @@ const ExportFormatCard = ({
   </div>
 );
 
-/* ── Mock export history ── */
-const exportHistory = [
-  {
-    id: 1,
-    name: "transformer_gaps_analysis.pdf",
-    format: "PDF",
-    date: "Feb 17, 2026",
-    size: "342 KB",
-    dotColor: "#f28b82",
-  },
-  {
-    id: 2,
-    name: "climate_review_insights.docx",
-    format: "DOCX",
-    date: "Feb 16, 2026",
-    size: "128 KB",
-    dotColor: "#8ab4f8",
-  },
-  {
-    id: 3,
-    name: "nlp_benchmark_data.csv",
-    format: "CSV",
-    date: "Feb 15, 2026",
-    size: "67 KB",
-    dotColor: "#81c995",
-  },
-  {
-    id: 4,
-    name: "quantum_analysis.json",
-    format: "JSON",
-    date: "Feb 14, 2026",
-    size: "45 KB",
-    dotColor: "#c58af9",
-  },
-];
+/* ── Helpers ── */
+const formatDotColors = {
+  PDF: "#f28b82",
+  DOCX: "#8ab4f8",
+  CSV: "#81c995",
+  JSON: "#c58af9",
+};
 
-function ExportsPage() {
+const downloadBlob = (content, filename, mimeType) => {
+  const blob = new Blob([content], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  return blob.size;
+};
+
+const formatBytes = (bytes) => {
+  if (bytes < 1024) return `${bytes} B`;
+  return `${(bytes / 1024).toFixed(0)} KB`;
+};
+
+function ExportsPage({ results }) {
   const [selectedFormat, setSelectedFormat] = useState("pdf");
   const [includeCharts, setIncludeCharts] = useState(true);
   const [includeSources, setIncludeSources] = useState(true);
+  const [exportHistory, setExportHistory] = useState([]);
+  const [exporting, setExporting] = useState(false);
+
+  /* ── Export generators ── */
+  const doExport = useCallback(() => {
+    if (!results) return;
+    setExporting(true);
+
+    setTimeout(() => {
+      let size = 0;
+      const ts = new Date();
+      const dateStr = ts.toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+
+      const analysisText = results.response || "";
+      const sourcesText = results.sources || "";
+      const fmt = selectedFormat.toUpperCase();
+
+      try {
+        if (selectedFormat === "json") {
+          const payload = { analysis: analysisText };
+          if (includeSources) payload.sources = sourcesText;
+          payload.exportedAt = ts.toISOString();
+          const json = JSON.stringify(payload, null, 2);
+          size = downloadBlob(json, `analysis_export.json`, "application/json");
+        }
+
+        if (selectedFormat === "csv") {
+          const escape = (s) => `"${s.replace(/"/g, '""')}"`;
+          let csv = "Section,Content\r\n";
+          csv += `Analysis,${escape(analysisText)}\r\n`;
+          if (includeSources) csv += `Sources,${escape(sourcesText)}\r\n`;
+          size = downloadBlob(csv, `analysis_export.csv`, "text/csv");
+        }
+
+        if (selectedFormat === "pdf") {
+          const doc = new jsPDF();
+          const pageW = doc.internal.pageSize.getWidth();
+          const margin = 20;
+          const maxW = pageW - margin * 2;
+          let y = 20;
+
+          // Title
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(18);
+          doc.text("Research Analysis Report", margin, y);
+          y += 12;
+
+          // Date
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(10);
+          doc.setTextColor(120);
+          doc.text(`Generated: ${dateStr}`, margin, y);
+          doc.setTextColor(0);
+          y += 12;
+
+          // Analysis heading
+          doc.setFont("helvetica", "bold");
+          doc.setFontSize(13);
+          doc.text("Analysis", margin, y);
+          y += 8;
+
+          // Analysis body
+          doc.setFont("helvetica", "normal");
+          doc.setFontSize(10);
+          const lines = doc.splitTextToSize(analysisText, maxW);
+          for (const line of lines) {
+            if (y > 275) {
+              doc.addPage();
+              y = 20;
+            }
+            doc.text(line, margin, y);
+            y += 5.5;
+          }
+
+          // Sources
+          if (includeSources && sourcesText) {
+            y += 8;
+            if (y > 260) {
+              doc.addPage();
+              y = 20;
+            }
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(13);
+            doc.text("Sources", margin, y);
+            y += 8;
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(9);
+            const srcLines = doc.splitTextToSize(sourcesText, maxW);
+            for (const line of srcLines) {
+              if (y > 275) {
+                doc.addPage();
+                y = 20;
+              }
+              doc.text(line, margin, y);
+              y += 5;
+            }
+          }
+
+          const pdfBlob = doc.output("blob");
+          size = pdfBlob.size;
+          doc.save("analysis_export.pdf");
+        }
+
+        if (selectedFormat === "docx") {
+          const html = `<html xmlns:o="urn:schemas-microsoft-com:office:office"
+            xmlns:w="urn:schemas-microsoft-com:office:word"
+            xmlns="http://www.w3.org/TR/REC-html40">
+            <head><meta charset="utf-8">
+            <style>
+              body{font-family:Calibri,sans-serif;font-size:11pt;line-height:1.6;margin:40px;}
+              h1{font-size:18pt;color:#1a73e8;}
+              h2{font-size:14pt;color:#333;margin-top:24px;}
+              p{white-space:pre-wrap;}
+              .meta{color:#888;font-size:9pt;}
+            </style></head>
+            <body>
+              <h1>Research Analysis Report</h1>
+              <p class="meta">Generated: ${dateStr}</p>
+              <h2>Analysis</h2>
+              <p>${analysisText.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>")}</p>
+              ${
+                includeSources && sourcesText
+                  ? `<h2>Sources</h2><p>${sourcesText.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>")}</p>`
+                  : ""
+              }
+            </body></html>`;
+          size = downloadBlob(html, "analysis_export.doc", "application/msword");
+        }
+
+        // Record in history
+        setExportHistory((prev) => [
+          {
+            id: Date.now(),
+            name: `analysis_export.${selectedFormat === "docx" ? "doc" : selectedFormat}`,
+            format: fmt,
+            date: dateStr,
+            size: formatBytes(size),
+            dotColor: formatDotColors[fmt],
+          },
+          ...prev,
+        ]);
+      } catch (err) {
+        console.error("Export failed:", err);
+      } finally {
+        setExporting(false);
+      }
+    }, 200);
+  }, [results, selectedFormat, includeSources]);
 
   const formats = [
     {
@@ -378,9 +521,18 @@ function ExportsPage() {
       </div>
 
       {/* Export Button */}
-      <button className="run-btn" style={{ marginBottom: 24 }}>
+      <button
+        className="run-btn"
+        style={{ marginBottom: 24, opacity: results ? 1 : 0.5 }}
+        disabled={!results || exporting}
+        onClick={doExport}
+      >
         <DownloadIcon />
-        Export as {selectedFormat.toUpperCase()}
+        {exporting
+          ? "Exporting…"
+          : results
+          ? `Export as ${selectedFormat.toUpperCase()}`
+          : "Analyze a paper first to export"}
       </button>
 
       {/* Export History */}
@@ -402,7 +554,19 @@ function ExportsPage() {
             {exportHistory.length} exports
           </span>
         </div>
-        {exportHistory.map((item, i) => (
+        {exportHistory.length === 0 ? (
+          <div
+            style={{
+              textAlign: "center",
+              padding: "28px 0",
+              color: "var(--text-ter)",
+              fontSize: 13,
+            }}
+          >
+            No exports yet. Analyze a paper and export your results.
+          </div>
+        ) : (
+          exportHistory.map((item, i) => (
           <div
             key={item.id}
             style={{
@@ -448,7 +612,8 @@ function ExportsPage() {
               <DownloadIcon />
             </button>
           </div>
-        ))}
+        ))
+        )}
       </div>
     </div>
   );

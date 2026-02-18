@@ -286,59 +286,18 @@ const DomainBreakdown = ({ items }) => (
 
 function DashboardPage() {
   const weeklyData = [
-    { label: "Mon", value: 3 },
-    { label: "Tue", value: 5 },
-    { label: "Wed", value: 2 },
-    { label: "Thu", value: 7 },
-    { label: "Fri", value: 4 },
-    { label: "Sat", value: 1 },
-    { label: "Sun", value: 6 },
+    { label: "Mon", value: 0 },
+    { label: "Tue", value: 0 },
+    { label: "Wed", value: 0 },
+    { label: "Thu", value: 0 },
+    { label: "Fri", value: 0 },
+    { label: "Sat", value: 0 },
+    { label: "Sun", value: 0 },
   ];
 
-  const domains = [
-    { label: "Computer Science", count: 12, pct: 80, color: "var(--blue)" },
-    { label: "Medicine & Health", count: 5, pct: 33, color: "var(--green)" },
-    {
-      label: "Physics & Engineering",
-      count: 3,
-      pct: 20,
-      color: "var(--purple)",
-    },
-    { label: "Social Sciences", count: 2, pct: 13, color: "var(--yellow)" },
-  ];
+  const domains = [];
 
-  const recentActivity = [
-    {
-      color: "#4285f4",
-      title: "Transformer architecture analysis",
-      time: "2 hours ago",
-      type: "Research Gaps",
-    },
-    {
-      color: "#81c995",
-      title: "Climate modeling review — IPCC AR6",
-      time: "5 hours ago",
-      type: "Key Insights",
-    },
-    {
-      color: "#c58af9",
-      title: "NLP benchmark survey 2025",
-      time: "Yesterday",
-      type: "Research Gaps",
-    },
-    {
-      color: "#fdd663",
-      title: "Quantum computing error correction",
-      time: "2 days ago",
-      type: "Citation",
-    },
-    {
-      color: "#78d9ec",
-      title: "Federated learning in healthcare",
-      time: "3 days ago",
-      type: "Key Insights",
-    },
-  ];
+  const recentActivity = [];
 
   return (
     <div className="anim-hero">
