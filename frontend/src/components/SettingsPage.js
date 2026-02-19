@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useTheme } from "../contexts/ThemeContext";
+import { useAuth } from "../contexts/AuthContext";
 
 /* ── SVG Icons ── */
 const UserIcon = () => (
@@ -255,9 +256,12 @@ const SettingInput = ({
 );
 
 function SettingsPage() {
+  /* Auth */
+  const { user } = useAuth();
+
   /* Profile */
-  const [displayName, setDisplayName] = useState("Researcher");
-  const [email, setEmail] = useState("researcher@university.edu");
+  const [displayName, setDisplayName] = useState(user?.name || "Researcher");
+  const [email] = useState(user?.email || "researcher@university.edu");
 
   /* Appearance */
   const { theme, setTheme, fontSize, setFontSize } = useTheme();
@@ -294,6 +298,33 @@ function SettingsPage() {
         title="Profile"
         description="Your personal information"
       >
+        {/* Avatar row */}
+        {user && (
+          <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 0 8px" }}>
+            {user.picture ? (
+              <img
+                src={user.picture}
+                alt={user.name}
+                referrerPolicy="no-referrer"
+                style={{ width: 56, height: 56, borderRadius: "50%", objectFit: "cover" }}
+              />
+            ) : (
+              <div style={{
+                width: 56, height: 56, borderRadius: "50%",
+                background: "var(--purple)", color: "#fff",
+                display: "flex", alignItems: "center", justifyContent: "center",
+                fontSize: 20, fontWeight: 600,
+              }}>
+                {(user.name || "?").split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)}
+              </div>
+            )}
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text-pri)" }}>{user.name}</div>
+              <div style={{ fontSize: 12, color: "var(--text-sec)", marginTop: 2 }}>Signed in with Google</div>
+            </div>
+          </div>
+        )}
+        {user && <div style={{ borderTop: "1px solid var(--border)" }} />}
         <SettingInput
           label="Display Name"
           value={displayName}
@@ -301,13 +332,20 @@ function SettingsPage() {
           placeholder="Your name"
         />
         <div style={{ borderTop: "1px solid var(--border)" }} />
-        <SettingInput
-          label="Email"
-          value={email}
-          onChange={setEmail}
-          placeholder="you@example.com"
-          type="email"
-        />
+        {/* Email is read-only — sourced from Google */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 0", gap: 16 }}>
+          <div>
+            <div style={{ fontSize: 14, fontWeight: 500, color: "var(--text-pri)" }}>Email</div>
+            <div style={{ fontSize: 12, color: "var(--text-sec)", marginTop: 2 }}>Managed by Google</div>
+          </div>
+          <div style={{
+            fontSize: 13, color: "var(--text-sec)",
+            background: "var(--surface2)", borderRadius: 8,
+            padding: "6px 14px", border: "1px solid var(--border)",
+          }}>
+            {email}
+          </div>
+        </div>
       </SettingsSection>
 
       {/* Appearance */}

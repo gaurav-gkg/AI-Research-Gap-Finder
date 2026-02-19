@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useHistory } from "../contexts/HistoryContext";
 
 /* ── SVG Icons ── */
 const SearchIcon = () => (
@@ -94,14 +95,14 @@ const DownloadIcon = () => (
   </svg>
 );
 
-/* ── Mock data ── */
-const mockAnalyses = [];
+/* ── Mock data removed — now using HistoryContext — */
 
 function PreviousAnalysesPage({ setActiveTab }) {
+  const { analyses, removeAnalysis } = useHistory();
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("all");
 
-  const filtered = mockAnalyses.filter((a) => {
+  const filtered = analyses.filter((a) => {
     const matchesSearch =
       a.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       a.paperName.toLowerCase().includes(searchQuery.toLowerCase());
@@ -259,7 +260,7 @@ function PreviousAnalysesPage({ setActiveTab }) {
                 <button className="icon-action-btn" title="Export">
                   <DownloadIcon />
                 </button>
-                <button className="icon-action-btn danger" title="Delete">
+                <button className="icon-action-btn danger" title="Delete" onClick={() => removeAnalysis(item.id)}>
                   <TrashIcon />
                 </button>
               </div>

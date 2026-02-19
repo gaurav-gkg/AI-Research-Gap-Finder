@@ -1,4 +1,5 @@
 import React from "react";
+import { useHistory } from "../contexts/HistoryContext";
 
 /* ── SVG Icons ── */
 const StarIcon = () => (
@@ -145,6 +146,7 @@ const MenuIcon = () => (
 );
 
 function Sidebar({ activeTab, setActiveTab, isCollapsed, setIsCollapsed }) {
+  const { recentItems } = useHistory();
   const navItems = [
     { id: "dashboard", label: "Dashboard", Icon: GridIcon },
     { id: "analyze", label: "Analyze Paper", Icon: SearchIcon },
@@ -152,8 +154,6 @@ function Sidebar({ activeTab, setActiveTab, isCollapsed, setIsCollapsed }) {
     { id: "documents", label: "My Documents", Icon: FolderIcon },
     { id: "exports", label: "Exports", Icon: DownloadIcon },
   ];
-
-  const recentItems = [];
 
   return (
     <aside className={`sidebar ${isCollapsed ? "collapsed" : ""}`}>
@@ -210,28 +210,34 @@ function Sidebar({ activeTab, setActiveTab, isCollapsed, setIsCollapsed }) {
             <div className="sidebar-section-label" style={{ marginTop: 8 }}>
               Recent
             </div>
-            {recentItems.map((item, i) => (
-              <button key={i} className="sidebar-recent-item">
-                <span
-                  style={{
-                    width: 6,
-                    height: 6,
-                    borderRadius: "50%",
-                    background: item.color,
-                    flexShrink: 0,
-                  }}
-                />
-                <span
-                  style={{
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {item.text}
-                </span>
-              </button>
-            ))}
+            {recentItems.length === 0 ? (
+              <div style={{ fontSize: 12, color: "var(--text-ter)", padding: "4px 12px" }}>
+                No recent analyses
+              </div>
+            ) : (
+              recentItems.map((item, i) => (
+                <button key={i} className="sidebar-recent-item" onClick={() => setActiveTab("history")}>
+                  <span
+                    style={{
+                      width: 6,
+                      height: 6,
+                      borderRadius: "50%",
+                      background: item.color,
+                      flexShrink: 0,
+                    }}
+                  />
+                  <span
+                    style={{
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {item.text}
+                  </span>
+                </button>
+              ))
+            )}
           </>
         )}
 

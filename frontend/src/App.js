@@ -11,6 +11,9 @@ import PreviousAnalysesPage from "./components/PreviousAnalysesPage";
 import MyDocumentsPage from "./components/MyDocumentsPage";
 import ExportsPage from "./components/ExportsPage";
 import SettingsPage from "./components/SettingsPage";
+import UserMenu from "./components/UserMenu";
+import { useAuth } from "./contexts/AuthContext";
+import { useHistory } from "./contexts/HistoryContext";
 
 /* ── SVG Icons for inline use ── */
 const SearchIcon = () => (
@@ -29,8 +32,11 @@ const SearchIcon = () => (
 );
 
 function App() {
+  const { isAuthenticated, openSignIn } = useAuth();
+  const { addAnalysis } = useHistory();
+
   /* ── State ── */
-  const [activeTab, setActiveTab] = useState("analyze");
+  const [activeTab, setActiveTab] = useState("dashboard");
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [useOnlyDocument, setUseOnlyDocument] = useState(true);
@@ -56,6 +62,12 @@ function App() {
 
   /* ── Analyze handler ── */
   const handleAnalyze = async () => {
+    // Gate: require sign-in before analysis
+    if (!isAuthenticated) {
+      openSignIn();
+      return;
+    }
+
     // Validate based on active tab
     if (activeUploadTab === "upload" && !selectedFile) {
       setError("Please upload a document first");
@@ -114,6 +126,50 @@ function App() {
         setResults(data);
         setSessionId(data.session_id);
         setChatMessages([]);
+
+        // ── Save to history ──────────────────────────────────────
+        const docName =
+          activeUploadTab === "upload"
+            ? selectedFile.name
+            : activeUploadTab === "paste"
+            ? "Pasted Text"
+            : (urlText.split("/").pop() || urlText).slice(0, 60);
+
+        const docExt =
+          activeUploadTab === "upload"
+            ? selectedFile.name.split(".").pop().toLowerCase()
+            : activeUploadTab === "paste"
+            ? "txt"
+            : "url";
+
+        const docSize =
+          activeUploadTab === "upload"
+            ? selectedFile.size >= 1024 * 1024
+              ? `${(selectedFile.size / (1024 * 1024)).toFixed(1)} MB`
+              : `${Math.round(selectedFile.size / 1024)} KB`
+            : activeUploadTab === "paste"
+            ? `${(pasteText.length / 1024).toFixed(1)} KB`
+            : "URL";
+
+        const gapsFound =
+          (data.response.match(/^\d+\./gm) || []).length ||
+          (data.response.match(/##/g) || []).length ||
+          1;
+
+        addAnalysis(
+          {
+            title: "Research Gap Analysis",
+            paperName: docName,
+            type: "Research Gaps",
+            response: data.response,
+            sources: data.sources,
+            sessionId: data.session_id,
+            gapsFound,
+            domain: "General",
+          },
+          { name: docName, ext: docExt, size: docSize }
+        );
+        // ────────────────────────────────────────────────────────
       } else {
         setError(data.error || "An error occurred during analysis");
       }
@@ -280,6 +336,11 @@ function App() {
       />
 
       <div className="main-wrapper">
+        {/* Top bar with user avatar / sign-in */}
+        <div className="top-bar">
+          <div className="top-bar-spacer" />
+          <UserMenu />
+        </div>
         <div className="main-content">{renderContent()}</div>
         {activeTab === "analyze" && results && (
           <>

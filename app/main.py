@@ -8,10 +8,15 @@ from dotenv import load_dotenv
 import os
 import tempfile
 import uuid
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
 from app.utils import query_rag, query_chat, get_or_create_vector_store, clear_vector_store, process_text, process_url, query_rag_from_vectorstore
 
 # Load environment variables
 load_dotenv()
+
+# Google OAuth Client ID — replace with your own from Google Cloud Console
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com")
 
 # Create FastAPI app
 app = FastAPI(title="Research Paper Analyzer API")
@@ -224,6 +229,45 @@ async def chat_with_paper(request: ChatRequest):
 @app.get("/api/health")
 async def health_check():
     return {"status": "healthy", "service": "Research Paper Analyzer"}
+
+# ── Google OAuth Authentication ──────────────────────────────────────────
+class GoogleAuthRequest(BaseModel):
+    credential: str  # The Google ID token (JWT) from frontend
+
+class GoogleAuthResponse(BaseModel):
+    success: bool
+    user: Optional[dict] = None
+    error: Optional[str] = None
+
+@app.post("/api/auth/google", response_model=GoogleAuthResponse)
+async def google_auth(request: GoogleAuthRequest):
+    """Verify Google OAuth token and return user info"""
+    try:
+        # Verify the Google ID token
+        idinfo = id_token.verify_oauth2_token(
+            request.credential,
+            google_requests.Request(),
+            GOOGLE_CLIENT_ID
+        )
+
+        # Token is valid — extract user information
+        user_data = {
+            "id": idinfo.get("sub"),
+            "email": idinfo.get("email"),
+            "name": idinfo.get("name"),
+            "picture": idinfo.get("picture"),
+            "given_name": idinfo.get("given_name"),
+            "family_name": idinfo.get("family_name"),
+            "email_verified": idinfo.get("email_verified", False),
+        }
+
+        return GoogleAuthResponse(success=True, user=user_data)
+
+    except ValueError as e:
+        # Invalid token
+        return GoogleAuthResponse(success=False, error=f"Invalid token: {str(e)}")
+    except Exception as e:
+        return GoogleAuthResponse(success=False, error=f"Authentication failed: {str(e)}")
 
 # Mount static files for React build (production)
 # Uncomment when you build React app

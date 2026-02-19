@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useHistory } from "../contexts/HistoryContext";
 
 /* ── SVG Icons ── */
 const SearchIcon = () => (
@@ -140,18 +141,26 @@ const UploadIcon = () => (
   </svg>
 );
 
-/* ── Mock data ── */
-const mockDocs = [];
+/* ── Mock data removed — now using HistoryContext — */
 
 function MyDocumentsPage({ setActiveTab }) {
+  const { documents, removeDocument } = useHistory();
   const [searchQuery, setSearchQuery] = useState("");
   const [viewMode, setViewMode] = useState("grid"); // "grid" | "list"
 
-  const filtered = mockDocs.filter((d) =>
+  const filtered = documents.filter((d) =>
     d.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  const totalSize = "0 MB";
+  // Compute total size from real data
+  const totalSizeKB = documents.reduce((sum, d) => {
+    const match = d.size.match(/[\d.]+/);
+    return sum + (match ? parseFloat(match[0]) : 0);
+  }, 0);
+  const totalSize =
+    totalSizeKB >= 1024
+      ? `${(totalSizeKB / 1024).toFixed(1)} MB`
+      : `${totalSizeKB.toFixed(0)} KB`;
 
   return (
     <div className="anim-hero">
@@ -175,7 +184,7 @@ function MyDocumentsPage({ setActiveTab }) {
           <div
             style={{ fontSize: 24, fontWeight: 600, color: "var(--text-pri)" }}
           >
-            {mockDocs.length}
+            {documents.length}
           </div>
           <div style={{ fontSize: 12, color: "var(--text-sec)", marginTop: 2 }}>
             Total Documents
@@ -201,7 +210,7 @@ function MyDocumentsPage({ setActiveTab }) {
           <div
             style={{ fontSize: 24, fontWeight: 600, color: "var(--text-pri)" }}
           >
-            {mockDocs.reduce((s, d) => s + d.analyses, 0)}
+            {documents.reduce((s, d) => s + d.analyses, 0)}
           </div>
           <div style={{ fontSize: 12, color: "var(--text-sec)", marginTop: 2 }}>
             Total Analyses
@@ -341,7 +350,7 @@ function MyDocumentsPage({ setActiveTab }) {
                   <button className="icon-action-btn" title="Download">
                     <DownloadIcon />
                   </button>
-                  <button className="icon-action-btn danger" title="Delete">
+                  <button className="icon-action-btn danger" title="Delete" onClick={() => removeDocument(doc.id)}>
                     <TrashIcon />
                   </button>
                 </div>
@@ -391,7 +400,7 @@ function MyDocumentsPage({ setActiveTab }) {
                 <button className="icon-action-btn" title="Download">
                   <DownloadIcon />
                 </button>
-                <button className="icon-action-btn danger" title="Delete">
+                <button className="icon-action-btn danger" title="Delete" onClick={() => removeDocument(doc.id)}>
                   <TrashIcon />
                 </button>
               </div>
