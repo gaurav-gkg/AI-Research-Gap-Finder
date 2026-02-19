@@ -3,7 +3,15 @@ import { GoogleLogin } from "@react-oauth/google";
 import { useAuth } from "../contexts/AuthContext";
 
 function UserMenu() {
-  const { user, isAuthenticated, handleGoogleLogin, logout, isSignInOpen, openSignIn, closeSignIn } = useAuth();
+  const {
+    user,
+    isAuthenticated,
+    handleGoogleLogin,
+    logout,
+    isSignInOpen,
+    openSignIn,
+    closeSignIn,
+  } = useAuth();
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef(null);
   const modalRef = useRef(null);
@@ -53,9 +61,7 @@ function UserMenu() {
               referrerPolicy="no-referrer"
             />
           ) : (
-            <div className="user-avatar-fallback">
-              {getInitials(user.name)}
-            </div>
+            <div className="user-avatar-fallback">{getInitials(user.name)}</div>
           )}
         </button>
 
@@ -112,20 +118,14 @@ function UserMenu() {
   // Not authenticated — show Sign In button
   return (
     <div className="user-menu">
-      <button
-        className="sign-in-btn"
-        onClick={openSignIn}
-      >
+      <button className="sign-in-btn" onClick={openSignIn}>
         Sign in
       </button>
 
       {isSignInOpen && (
         <div className="sign-in-modal-overlay">
           <div className="sign-in-modal" ref={modalRef}>
-            <button
-              className="sign-in-modal-close"
-              onClick={closeSignIn}
-            >
+            <button className="sign-in-modal-close" onClick={closeSignIn}>
               <svg
                 width="20"
                 height="20"

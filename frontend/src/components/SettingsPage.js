@@ -300,27 +300,64 @@ function SettingsPage() {
       >
         {/* Avatar row */}
         {user && (
-          <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 0 8px" }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 16,
+              padding: "16px 0 8px",
+            }}
+          >
             {user.picture ? (
               <img
                 src={user.picture}
                 alt={user.name}
                 referrerPolicy="no-referrer"
-                style={{ width: 56, height: 56, borderRadius: "50%", objectFit: "cover" }}
+                style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: "50%",
+                  objectFit: "cover",
+                }}
               />
             ) : (
-              <div style={{
-                width: 56, height: 56, borderRadius: "50%",
-                background: "var(--purple)", color: "#fff",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                fontSize: 20, fontWeight: 600,
-              }}>
-                {(user.name || "?").split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)}
+              <div
+                style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: "50%",
+                  background: "var(--purple)",
+                  color: "#fff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 20,
+                  fontWeight: 600,
+                }}
+              >
+                {(user.name || "?")
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")
+                  .toUpperCase()
+                  .slice(0, 2)}
               </div>
             )}
             <div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text-pri)" }}>{user.name}</div>
-              <div style={{ fontSize: 12, color: "var(--text-sec)", marginTop: 2 }}>Signed in with Google</div>
+              <div
+                style={{
+                  fontSize: 14,
+                  fontWeight: 600,
+                  color: "var(--text-pri)",
+                }}
+              >
+                {user.name}
+              </div>
+              <div
+                style={{ fontSize: 12, color: "var(--text-sec)", marginTop: 2 }}
+              >
+                Signed in with Google
+              </div>
             </div>
           </div>
         )}
@@ -333,16 +370,41 @@ function SettingsPage() {
         />
         <div style={{ borderTop: "1px solid var(--border)" }} />
         {/* Email is read-only — sourced from Google */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "14px 0", gap: 16 }}>
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "14px 0",
+            gap: 16,
+          }}
+        >
           <div>
-            <div style={{ fontSize: 14, fontWeight: 500, color: "var(--text-pri)" }}>Email</div>
-            <div style={{ fontSize: 12, color: "var(--text-sec)", marginTop: 2 }}>Managed by Google</div>
+            <div
+              style={{
+                fontSize: 14,
+                fontWeight: 500,
+                color: "var(--text-pri)",
+              }}
+            >
+              Email
+            </div>
+            <div
+              style={{ fontSize: 12, color: "var(--text-sec)", marginTop: 2 }}
+            >
+              Managed by Google
+            </div>
           </div>
-          <div style={{
-            fontSize: 13, color: "var(--text-sec)",
-            background: "var(--surface2)", borderRadius: 8,
-            padding: "6px 14px", border: "1px solid var(--border)",
-          }}>
+          <div
+            style={{
+              fontSize: 13,
+              color: "var(--text-sec)",
+              background: "var(--surface2)",
+              borderRadius: 8,
+              padding: "6px 14px",
+              border: "1px solid var(--border)",
+            }}
+          >
             {email}
           </div>
         </div>
@@ -497,7 +559,7 @@ function SettingsPage() {
           label="Ollama API Endpoint"
           desc="URL for your local Ollama instance"
           value="http://localhost:11434"
-          onChange={() => { }}
+          onChange={() => {}}
           placeholder="http://localhost:11434"
         />
         <div style={{ borderTop: "1px solid var(--border)" }} />
@@ -505,7 +567,7 @@ function SettingsPage() {
           label="Backend API URL"
           desc="URL for the ResearchAI FastAPI server"
           value="http://localhost:8000"
-          onChange={() => { }}
+          onChange={() => {}}
           placeholder="http://localhost:8000"
         />
       </SettingsSection>

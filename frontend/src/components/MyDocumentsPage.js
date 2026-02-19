@@ -350,7 +350,11 @@ function MyDocumentsPage({ setActiveTab }) {
                   <button className="icon-action-btn" title="Download">
                     <DownloadIcon />
                   </button>
-                  <button className="icon-action-btn danger" title="Delete" onClick={() => removeDocument(doc.id)}>
+                  <button
+                    className="icon-action-btn danger"
+                    title="Delete"
+                    onClick={() => removeDocument(doc.id)}
+                  >
                     <TrashIcon />
                   </button>
                 </div>
@@ -400,7 +404,11 @@ function MyDocumentsPage({ setActiveTab }) {
                 <button className="icon-action-btn" title="Download">
                   <DownloadIcon />
                 </button>
-                <button className="icon-action-btn danger" title="Delete" onClick={() => removeDocument(doc.id)}>
+                <button
+                  className="icon-action-btn danger"
+                  title="Delete"
+                  onClick={() => removeDocument(doc.id)}
+                >
                   <TrashIcon />
                 </button>
               </div>

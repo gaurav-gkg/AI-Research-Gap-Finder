@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
 import { useAuth } from "./AuthContext";
 
 const HistoryContext = createContext();
@@ -9,9 +15,17 @@ export const useHistory = () => {
   return ctx;
 };
 
-const DOT_COLORS = ["#8ab4f8", "#81c995", "#c58af9", "#fdd663", "#78d9ec", "#f28b82"];
+const DOT_COLORS = [
+  "#8ab4f8",
+  "#81c995",
+  "#c58af9",
+  "#fdd663",
+  "#78d9ec",
+  "#f28b82",
+];
 
-const makeId = () => Date.now().toString(36) + Math.random().toString(36).slice(2);
+const makeId = () =>
+  Date.now().toString(36) + Math.random().toString(36).slice(2);
 
 const formatDate = () =>
   new Date().toLocaleDateString("en-US", {
@@ -80,7 +94,10 @@ export const HistoryProvider = ({ children }) => {
           };
           return updated;
         }
-        return [{ id: makeId(), ...docInfo, uploaded: date, analyses: 1 }, ...prev];
+        return [
+          { id: makeId(), ...docInfo, uploaded: date, analyses: 1 },
+          ...prev,
+        ];
       });
     }
   }, []);
@@ -101,7 +118,14 @@ export const HistoryProvider = ({ children }) => {
 
   return (
     <HistoryContext.Provider
-      value={{ analyses, documents, addAnalysis, removeAnalysis, removeDocument, recentItems }}
+      value={{
+        analyses,
+        documents,
+        addAnalysis,
+        removeAnalysis,
+        removeDocument,
+        recentItems,
+      }}
     >
       {children}
     </HistoryContext.Provider>

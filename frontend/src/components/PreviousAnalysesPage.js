@@ -260,7 +260,11 @@ function PreviousAnalysesPage({ setActiveTab }) {
                 <button className="icon-action-btn" title="Export">
                   <DownloadIcon />
                 </button>
-                <button className="icon-action-btn danger" title="Delete" onClick={() => removeAnalysis(item.id)}>
+                <button
+                  className="icon-action-btn danger"
+                  title="Delete"
+                  onClick={() => removeAnalysis(item.id)}
+                >
                   <TrashIcon />
                 </button>
               </div>

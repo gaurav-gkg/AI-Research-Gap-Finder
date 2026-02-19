@@ -132,15 +132,15 @@ function App() {
           activeUploadTab === "upload"
             ? selectedFile.name
             : activeUploadTab === "paste"
-            ? "Pasted Text"
-            : (urlText.split("/").pop() || urlText).slice(0, 60);
+              ? "Pasted Text"
+              : (urlText.split("/").pop() || urlText).slice(0, 60);
 
         const docExt =
           activeUploadTab === "upload"
             ? selectedFile.name.split(".").pop().toLowerCase()
             : activeUploadTab === "paste"
-            ? "txt"
-            : "url";
+              ? "txt"
+              : "url";
 
         const docSize =
           activeUploadTab === "upload"
@@ -148,8 +148,8 @@ function App() {
               ? `${(selectedFile.size / (1024 * 1024)).toFixed(1)} MB`
               : `${Math.round(selectedFile.size / 1024)} KB`
             : activeUploadTab === "paste"
-            ? `${(pasteText.length / 1024).toFixed(1)} KB`
-            : "URL";
+              ? `${(pasteText.length / 1024).toFixed(1)} KB`
+              : "URL";
 
         const gapsFound =
           (data.response.match(/^\d+\./gm) || []).length ||
@@ -167,7 +167,7 @@ function App() {
             gapsFound,
             domain: "General",
           },
-          { name: docName, ext: docExt, size: docSize }
+          { name: docName, ext: docExt, size: docSize },
         );
         // ────────────────────────────────────────────────────────
       } else {

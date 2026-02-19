@@ -211,12 +211,22 @@ function Sidebar({ activeTab, setActiveTab, isCollapsed, setIsCollapsed }) {
               Recent
             </div>
             {recentItems.length === 0 ? (
-              <div style={{ fontSize: 12, color: "var(--text-ter)", padding: "4px 12px" }}>
+              <div
+                style={{
+                  fontSize: 12,
+                  color: "var(--text-ter)",
+                  padding: "4px 12px",
+                }}
+              >
                 No recent analyses
               </div>
             ) : (
               recentItems.map((item, i) => (
-                <button key={i} className="sidebar-recent-item" onClick={() => setActiveTab("history")}>
+                <button
+                  key={i}
+                  className="sidebar-recent-item"
+                  onClick={() => setActiveTab("history")}
+                >
                   <span
                     style={{
                       width: 6,
