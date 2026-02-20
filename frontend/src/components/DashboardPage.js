@@ -1,6 +1,8 @@
 import React from "react";
 import HeroSection from "./HeroSection";
 import SuggestionChips from "./SuggestionChips";
+import { useHistory } from "../contexts/HistoryContext";
+import { useAuth } from "../contexts/AuthContext";
 
 /* ── SVG Icons ── */
 const DocIcon = () => (
@@ -206,7 +208,7 @@ const ActivityItem = ({ color, title, time, type }) => (
 
 /* ── Bar Chart (simple visual) ── */
 const MiniBarChart = ({ data }) => {
-  const max = Math.max(...data.map((d) => d.value));
+  const max = Math.max(...data.map((d) => d.value), 1);
   return (
     <div
       style={{
@@ -248,56 +250,132 @@ const MiniBarChart = ({ data }) => {
 };
 
 /* ── Domain Breakdown ── */
-const DomainBreakdown = ({ items }) => (
-  <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-    {items.map((item, i) => (
-      <div key={i}>
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            marginBottom: 6,
-          }}
-        >
-          <span style={{ fontSize: 13, color: "var(--text-pri)" }}>
-            {item.label}
-          </span>
-          <span style={{ fontSize: 12, color: "var(--text-sec)" }}>
-            {item.count} papers
-          </span>
-        </div>
-        <div
-          style={{ height: 4, borderRadius: 2, background: "var(--surface3)" }}
-        >
+const DomainBreakdown = ({ items }) =>
+  items.length === 0 ? (
+    <div
+      style={{
+        textAlign: "center",
+        padding: "24px 0",
+        color: "var(--text-ter)",
+        fontSize: 13,
+      }}
+    >
+      No domain data yet.
+    </div>
+  ) : (
+    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      {items.map((item, i) => (
+        <div key={i}>
           <div
             style={{
-              height: "100%",
-              borderRadius: 2,
-              background: item.color,
-              width: `${item.pct}%`,
-              transition: "width 0.8s ease",
+              display: "flex",
+              justifyContent: "space-between",
+              marginBottom: 6,
             }}
-          />
+          >
+            <span style={{ fontSize: 13, color: "var(--text-pri)" }}>
+              {item.label}
+            </span>
+            <span style={{ fontSize: 12, color: "var(--text-sec)" }}>
+              {item.count} papers
+            </span>
+          </div>
+          <div
+            style={{
+              height: 4,
+              borderRadius: 2,
+              background: "var(--surface3)",
+            }}
+          >
+            <div
+              style={{
+                height: "100%",
+                borderRadius: 2,
+                background: item.color,
+                width: `${item.pct}%`,
+                transition: "width 0.8s ease",
+              }}
+            />
+          </div>
         </div>
-      </div>
-    ))}
-  </div>
-);
+      ))}
+    </div>
+  );
 
 function DashboardPage() {
-  const weeklyData = [
-    { label: "Mon", value: 0 },
-    { label: "Tue", value: 0 },
-    { label: "Wed", value: 0 },
-    { label: "Thu", value: 0 },
-    { label: "Fri", value: 0 },
-    { label: "Sat", value: 0 },
-    { label: "Sun", value: 0 },
-  ];
+  const { analyses, documents, dbReady } = useHistory();
+  const { user } = useAuth();
 
-  const domains = [];
+  // Weekly activity: count analyses per day of the current week
+  const weeklyData = React.useMemo(() => {
+    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    const counts = { Sun: 0, Mon: 0, Tue: 0, Wed: 0, Thu: 0, Fri: 0, Sat: 0 };
+    const now = new Date();
+    const weekStart = new Date(now);
+    weekStart.setDate(now.getDate() - now.getDay());
+    weekStart.setHours(0, 0, 0, 0);
+    analyses.forEach((a) => {
+      const d = new Date(a.created_at || a.date);
+      if (d >= weekStart) {
+        const key = dayNames[d.getDay()];
+        counts[key] = (counts[key] || 0) + 1;
+      }
+    });
+    return dayNames.map((d) => ({ label: d, value: counts[d] }));
+  }, [analyses]);
 
-  const recentActivity = [];
+  // Domain breakdown derived from analyses
+  const domains = React.useMemo(() => {
+    const domainColors = [
+      "var(--blue)",
+      "var(--purple)",
+      "var(--green)",
+      "var(--yellow)",
+      "#f97316",
+    ];
+    const map = {};
+    analyses.forEach((a) => {
+      const key = a.domain || "General";
+      map[key] = (map[key] || 0) + 1;
+    });
+    const total = analyses.length || 1;
+    return Object.entries(map)
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 5)
+      .map(([label, count], i) => ({
+        label,
+        count,
+        pct: Math.round((count / total) * 100),
+        color: domainColors[i % domainColors.length],
+      }));
+  }, [analyses]);
+
+  // Recent activity items from analyses
+  const recentActivity = React.useMemo(() => {
+    const dotColors = [
+      "var(--blue)",
+      "var(--purple)",
+      "var(--green)",
+      "var(--yellow)",
+      "#f97316",
+    ];
+    return analyses.slice(0, 5).map((a, i) => ({
+      color: a.dot_color || dotColors[i % dotColors.length],
+      title: a.title || a.paper_name || "Untitled",
+      time: a.created_at
+        ? new Date(a.created_at).toLocaleString(undefined, {
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+        : a.date || "",
+      type: a.type || "Analysis",
+    }));
+  }, [analyses]);
+
+  const totalGaps = analyses.reduce((acc, a) => acc + (a.gaps_found || 0), 0);
+  const thisWeekCount = weeklyData.reduce((s, d) => s + d.value, 0);
 
   return (
     <div className="anim-hero">
@@ -307,7 +385,9 @@ function DashboardPage() {
 
       {/* Page Header */}
       <div style={{ marginBottom: 32 }}>
-        <h1 className="page-title">Dashboard</h1>
+        <h1 className="page-title">
+          {user ? `Welcome back, ${user.given_name || user.name}` : "Dashboard"}
+        </h1>
         <p className="page-subtitle">
           Your research analysis overview at a glance.
         </p>
@@ -318,27 +398,36 @@ function DashboardPage() {
         <StatCard
           icon={<DocIcon />}
           label="Documents Analyzed"
-          value="0"
-          change="+0 this week"
+          value={dbReady ? analyses.length : "…"}
+          change={`+${thisWeekCount} this week`}
           changeColor="var(--green)"
           accentColor="var(--blue)"
         />
         <StatCard
           icon={<CheckCircleIcon />}
           label="Gaps Identified"
-          value="0"
+          value={dbReady ? totalGaps : "…"}
           accentColor="var(--green)"
         />
         <StatCard
           icon={<ClockIcon />}
-          label="Avg. Analysis Time"
-          value="—"
+          label="Documents Stored"
+          value={dbReady ? documents.length : "…"}
           accentColor="var(--purple)"
         />
         <StatCard
           icon={<TrendUpIcon />}
-          label="Research Score"
-          value="—"
+          label="Last Analyzed"
+          value={
+            analyses.length > 0
+              ? new Date(
+                  analyses[0].created_at || analyses[0].date,
+                ).toLocaleDateString(undefined, {
+                  month: "short",
+                  day: "numeric",
+                })
+              : "—"
+          }
           accentColor="var(--yellow)"
         />
       </div>
@@ -425,9 +514,20 @@ function DashboardPage() {
             View all
           </span>
         </div>
-        {recentActivity.map((item, i) => (
-          <ActivityItem key={i} {...item} />
-        ))}
+        {recentActivity.length === 0 ? (
+          <div
+            style={{
+              textAlign: "center",
+              padding: "24px 0",
+              color: "var(--text-ter)",
+              fontSize: 13,
+            }}
+          >
+            No analyses yet. Run your first analysis to see activity here.
+          </div>
+        ) : (
+          recentActivity.map((item, i) => <ActivityItem key={i} {...item} />)
+        )}
       </div>
     </div>
   );
