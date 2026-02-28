@@ -1,6 +1,6 @@
 ﻿# AI Research Gap Finder
 
-> A full-stack web application that leverages **Retrieval-Augmented Generation (RAG)** to analyze research papers — extracting key insights or identifying research gaps in seconds.
+> A full-stack web application that leverages **Retrieval-Augmented Generation (RAG)** to analyze research papers - extracting key insights or identifying research gaps in seconds.
 
 ---
 

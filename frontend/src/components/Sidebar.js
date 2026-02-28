@@ -6,7 +6,13 @@ import { useTheme } from "../contexts/ThemeContext";
 
 /* Logo icon mark — research doc + magnifier */
 const LogoIcon = ({ size = 30 }) => (
-  <svg width={size} height={size} viewBox="0 0 58 58" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 58 58"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
     <defs>
       <linearGradient id="li_g1" x1="0" y1="0" x2="1" y2="1">
         <stop offset="0%" stopColor="#4285f4" />
@@ -25,21 +31,79 @@ const LogoIcon = ({ size = 30 }) => (
     {/* Document fill */}
     <rect x="10" y="7" width="28" height="36" rx="4" fill="url(#li_g3)" />
     {/* Document border */}
-    <rect x="10" y="7" width="28" height="36" rx="4" stroke="url(#li_g1)" strokeWidth="1.5" fill="none" />
+    <rect
+      x="10"
+      y="7"
+      width="28"
+      height="36"
+      rx="4"
+      stroke="url(#li_g1)"
+      strokeWidth="1.5"
+      fill="none"
+    />
     {/* Content lines */}
-    <line x1="16" y1="16" x2="32" y2="16" stroke="#8ab4f8" strokeWidth="1.5" strokeLinecap="round" opacity="0.7" />
-    <line x1="16" y1="21" x2="32" y2="21" stroke="#8ab4f8" strokeWidth="1.5" strokeLinecap="round" opacity="0.5" />
-    <line x1="16" y1="26" x2="26" y2="26" stroke="#8ab4f8" strokeWidth="1.5" strokeLinecap="round" opacity="0.35" />
+    <line
+      x1="16"
+      y1="16"
+      x2="32"
+      y2="16"
+      stroke="#8ab4f8"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      opacity="0.7"
+    />
+    <line
+      x1="16"
+      y1="21"
+      x2="32"
+      y2="21"
+      stroke="#8ab4f8"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      opacity="0.5"
+    />
+    <line
+      x1="16"
+      y1="26"
+      x2="26"
+      y2="26"
+      stroke="#8ab4f8"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      opacity="0.35"
+    />
     {/* Magnifier dark bg */}
     <circle cx="37" cy="37" r="11" fill="#1e2227" />
     {/* Magnifier outer ring */}
-    <circle cx="37" cy="37" r="10" fill="none" stroke="url(#li_g1)" strokeWidth="2" />
+    <circle
+      cx="37"
+      cy="37"
+      r="10"
+      fill="none"
+      stroke="url(#li_g1)"
+      strokeWidth="2"
+    />
     {/* Magnifier inner ring */}
-    <circle cx="37" cy="37" r="6" fill="none" stroke="url(#li_g1)" strokeWidth="1.5" />
+    <circle
+      cx="37"
+      cy="37"
+      r="6"
+      fill="none"
+      stroke="url(#li_g1)"
+      strokeWidth="1.5"
+    />
     {/* Center dot */}
     <circle cx="37" cy="37" r="2" fill="url(#li_g2)" />
     {/* Handle */}
-    <line x1="44.5" y1="44.5" x2="50" y2="50" stroke="url(#li_g2)" strokeWidth="2.5" strokeLinecap="round" />
+    <line
+      x1="44.5"
+      y1="44.5"
+      x2="50"
+      y2="50"
+      stroke="url(#li_g2)"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+    />
     {/* Star spark */}
     <g transform="translate(44, 12)">
       <path
@@ -52,7 +116,13 @@ const LogoIcon = ({ size = 30 }) => (
 
 /* Light-theme variant — blue doc lines, no dark magnifier bg, for light backgrounds */
 const LogoIconLight = ({ size = 30 }) => (
-  <svg width={size} height={size} viewBox="0 0 58 58" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 58 58"
+    fill="none"
+    xmlns="http://www.w3.org/2000/svg"
+  >
     <defs>
       <linearGradient id="llt_g1" x1="0" y1="0" x2="1" y2="1">
         <stop offset="0%" stopColor="#4285f4" />
@@ -65,16 +135,67 @@ const LogoIconLight = ({ size = 30 }) => (
       </linearGradient>
     </defs>
     {/* Document */}
-    <rect x="10" y="7" width="28" height="36" rx="4" stroke="url(#llt_g1)" strokeWidth="1.5" fill="rgba(66,133,244,0.08)" />
+    <rect
+      x="10"
+      y="7"
+      width="28"
+      height="36"
+      rx="4"
+      stroke="url(#llt_g1)"
+      strokeWidth="1.5"
+      fill="rgba(66,133,244,0.08)"
+    />
     {/* Content lines — blue on light */}
-    <line x1="16" y1="16" x2="32" y2="16" stroke="#4285f4" strokeWidth="1.5" strokeLinecap="round" opacity="0.7" />
-    <line x1="16" y1="21" x2="32" y2="21" stroke="#4285f4" strokeWidth="1.5" strokeLinecap="round" opacity="0.5" />
-    <line x1="16" y1="26" x2="26" y2="26" stroke="#4285f4" strokeWidth="1.5" strokeLinecap="round" opacity="0.35" />
+    <line
+      x1="16"
+      y1="16"
+      x2="32"
+      y2="16"
+      stroke="#4285f4"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      opacity="0.7"
+    />
+    <line
+      x1="16"
+      y1="21"
+      x2="32"
+      y2="21"
+      stroke="#4285f4"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      opacity="0.5"
+    />
+    <line
+      x1="16"
+      y1="26"
+      x2="26"
+      y2="26"
+      stroke="#4285f4"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      opacity="0.35"
+    />
     {/* Magnifier — no dark fill */}
-    <circle cx="37" cy="37" r="10" fill="none" stroke="url(#llt_g1)" strokeWidth="2" />
+    <circle
+      cx="37"
+      cy="37"
+      r="10"
+      fill="none"
+      stroke="url(#llt_g1)"
+      strokeWidth="2"
+    />
     <circle cx="37" cy="37" r="2" fill="url(#llt_g2)" />
     {/* Handle */}
-    <line x1="44.5" y1="44.5" x2="50" y2="50" stroke="url(#llt_g2)" strokeWidth="2.5" strokeLinecap="round" />
+    <line
+      x1="44.5"
+      y1="44.5"
+      x2="50"
+      y2="50"
+      stroke="url(#llt_g2)"
+      strokeWidth="2.5"
+      strokeLinecap="round"
+    />
     {/* Star spark */}
     <g transform="translate(44, 12)">
       <path
@@ -239,67 +360,88 @@ function Sidebar({ activeTab, setActiveTab, isCollapsed, setIsCollapsed }) {
         {!isCollapsed && (
           <div className="sidebar-logo">
             {/* Icon mark */}
-            <div style={{
-              position: "relative",
-              width: 36,
-              height: 36,
-              flexShrink: 0,
-            }}>
-              <div style={{
-                position: "absolute",
-                inset: 0,
-                borderRadius: 10,
-                background: isLight ? "#ffffff" : "#1e2227",
-                border: isLight
-                  ? "1px solid rgba(66,133,244,0.2)"
-                  : "1px solid rgba(255,255,255,0.1)",
-                boxShadow: isLight
-                  ? "0 2px 10px rgba(0,0,0,0.1), 0 0 0 1px rgba(66,133,244,0.15)"
-                  : "0 0 0 1px rgba(66,133,244,0.15), inset 0 1px 0 rgba(255,255,255,0.06)",
-                overflow: "hidden",
-              }}>
+            <div
+              style={{
+                position: "relative",
+                width: 36,
+                height: 36,
+                flexShrink: 0,
+              }}
+            >
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  borderRadius: 10,
+                  background: isLight ? "#ffffff" : "#1e2227",
+                  border: isLight
+                    ? "1px solid rgba(66,133,244,0.2)"
+                    : "1px solid rgba(255,255,255,0.1)",
+                  boxShadow: isLight
+                    ? "0 2px 10px rgba(0,0,0,0.1), 0 0 0 1px rgba(66,133,244,0.15)"
+                    : "0 0 0 1px rgba(66,133,244,0.15), inset 0 1px 0 rgba(255,255,255,0.06)",
+                  overflow: "hidden",
+                }}
+              >
                 {!isLight && (
-                  <div style={{
-                    position: "absolute",
-                    inset: 0,
-                    background: "linear-gradient(135deg, rgba(66,133,244,0.1), rgba(156,39,176,0.06))",
-                  }} />
+                  <div
+                    style={{
+                      position: "absolute",
+                      inset: 0,
+                      background:
+                        "linear-gradient(135deg, rgba(66,133,244,0.1), rgba(156,39,176,0.06))",
+                    }}
+                  />
                 )}
               </div>
-              <div style={{
-                position: "absolute",
-                inset: 0,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                zIndex: 1,
-              }}>
+              <div
+                style={{
+                  position: "absolute",
+                  inset: 0,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  zIndex: 1,
+                }}
+              >
                 {isLight ? <LogoIconLight size={22} /> : <LogoIcon size={22} />}
               </div>
             </div>
             {/* Wordmark */}
             <div style={{ display: "flex", flexDirection: "column", gap: 1 }}>
-              <div style={{
-                fontFamily: "'Google Sans Display', 'Google Sans', sans-serif",
-                fontSize: 17,
-                fontWeight: 700,
-                letterSpacing: "-0.02em",
-                lineHeight: 1,
-              }}>
-                <span style={{ color: isLight ? "#202124" : "#e3e3e3" }}>Research</span>
-                <span style={{
-                  background: "linear-gradient(135deg, #4285f4, #9c27b0 50%, #e91e63)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                }}>AI</span>
+              <div
+                style={{
+                  fontFamily:
+                    "'Google Sans Display', 'Google Sans', sans-serif",
+                  fontSize: 17,
+                  fontWeight: 700,
+                  letterSpacing: "-0.02em",
+                  lineHeight: 1,
+                }}
+              >
+                <span style={{ color: isLight ? "#202124" : "#e3e3e3" }}>
+                  Research
+                </span>
+                <span
+                  style={{
+                    background:
+                      "linear-gradient(135deg, #4285f4, #9c27b0 50%, #e91e63)",
+                    WebkitBackgroundClip: "text",
+                    WebkitTextFillColor: "transparent",
+                    backgroundClip: "text",
+                  }}
+                >
+                  AI
+                </span>
               </div>
-              <div style={{
-                fontSize: 10,
-                letterSpacing: "0.1em",
-                textTransform: "uppercase",
-                color: isLight ? "#9aa0a6" : "#5f6368",
-              }}>
+              <div
+                style={{
+                  fontSize: 10,
+                  letterSpacing: "0.1em",
+                  textTransform: "uppercase",
+                  color: isLight ? "#9aa0a6" : "#5f6368",
+                }}
+              >
                 Gap Analyzer
               </div>
             </div>
